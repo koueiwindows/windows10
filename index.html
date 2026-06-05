@@ -269,158 +269,139 @@
             font-size: 20px;
         }
 
-        /* テキストエディタ */
-        .window-content textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            resize: none;
-            padding: 8px;
-        }
-
-        /* 計算機 */
-        .calculator {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            padding: 10px;
-        }
-
-        .calc-display {
-            grid-column: 1 / -1;
-            background: #1e1e1e;
-            color: #00ff00;
-            padding: 10px;
-            text-align: right;
-            font-size: 24px;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 10px;
-            border-radius: 2px;
-        }
-
-        .calc-btn {
-            padding: 15px;
-            background: #e0e0e0;
-            border: 1px solid #999;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 2px;
-            transition: background 0.2s;
-        }
-
-        .calc-btn:hover {
-            background: #f0f0f0;
-        }
-
-        .calc-btn:active {
-            background: #d0d0d0;
-        }
-
-        .calc-btn.operator {
-            background: #0078d4;
-            color: white;
-        }
-
-        .calc-btn.operator:hover {
-            background: #005a9e;
-        }
-
-        .calc-btn.equals {
-            background: #107c10;
-            color: white;
-            grid-column: 1 / -1;
-        }
-
-        .calc-btn.equals:hover {
-            background: #0b5614;
-        }
-
-        /* ファイルエクスプローラー */
-        .file-explorer {
+        /* To-Do List ウィンドウ用スタイル */
+        .todolist-container {
             display: flex;
             flex-direction: column;
             height: 100%;
         }
 
-        .file-explorer-toolbar {
-            background: #f0f0f0;
-            padding: 8px 12px;
-            border-bottom: 1px solid #ddd;
+        .todo-input-section {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
         }
 
-        .file-explorer-toolbar button {
-            padding: 6px 12px;
-            background: #e0e0e0;
-            border: 1px solid #999;
-            cursor: pointer;
-            border-radius: 2px;
+        .todo-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 12px;
         }
 
-        .file-list {
+        .todo-input:focus {
+            outline: none;
+            border-color: #0078d4;
+        }
+
+        .todo-priority-select {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .todo-add-btn {
+            padding: 8px 16px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .todo-add-btn:hover {
+            background: #005a9e;
+        }
+
+        .todo-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 8px;
         }
 
-        .file-item {
-            padding: 8px 12px;
+        .todo-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-radius: 2px;
-        }
-
-        .file-item:hover {
-            background: #e8f4f8;
-        }
-
-        .file-item-icon {
-            font-size: 20px;
-        }
-
-        /* 設定 */
-        .settings-content {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 15px;
-        }
-
-        .setting-section {
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 15px;
-        }
-
-        .setting-section h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
+            gap: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            margin-bottom: 6px;
             font-size: 13px;
         }
 
-        .setting-item input[type="checkbox"] {
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .todo-checkbox {
+            width: 16px;
+            height: 16px;
             cursor: pointer;
         }
 
-        .slider {
-            width: 100%;
-            margin-top: 5px;
+        .todo-text {
+            flex: 1;
+            color: #333;
+        }
+
+        .todo-priority-tag {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .todo-priority-tag.high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .todo-priority-tag.medium {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .todo-priority-tag.low {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .todo-delete-btn {
+            width: 20px;
+            height: 20px;
+            background: #ff6b6b;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .todo-delete-btn:hover {
+            background: #ff5252;
+        }
+
+        .todo-stats {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            gap: 15px;
         }
     </style>
 </head>
@@ -439,6 +420,10 @@
             <div class="desktop-icon" onclick="openWindow('calculator')">
                 <div class="desktop-icon-image">🧮</div>
                 <div class="desktop-icon-label">計算機</div>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('todolist')">
+                <div class="desktop-icon-image">✓</div>
+                <div class="desktop-icon-label">タスク</div>
             </div>
             <div class="desktop-icon" onclick="openWindow('settings')">
                 <div class="desktop-icon-image">⚙️</div>
@@ -464,6 +449,10 @@
                     <span class="start-menu-item-icon">🧮</span>
                     <span>計算機</span>
                 </div>
+                <div class="start-menu-item" onclick="openWindow('todolist'); closeStartMenu()">
+                    <span class="start-menu-item-icon">✓</span>
+                    <span>タスク管理</span>
+                </div>
                 <div class="start-menu-item" onclick="openWindow('settings'); closeStartMenu()">
                     <span class="start-menu-item-icon">⚙️</span>
                     <span>設定</span>
@@ -488,7 +477,7 @@
                 </div>
             </div>
             <div class="window-content">
-                <textarea placeholder="ここにテキストを入力してください..."></textarea>
+                <textarea placeholder="ここにテキストを入力してください..." style="width: 100%; height: 100%; border: none; font-family: 'Courier New', monospace; font-size: 14px; resize: none; padding: 8px;"></textarea>
             </div>
         </div>
 
@@ -503,37 +492,28 @@
                 </div>
             </div>
             <div class="window-content">
-                <div class="file-explorer">
-                    <div class="file-explorer-toolbar">
-                        <button>← 戻る</button>
-                        <button>→ 進む</button>
-                        <button>↑ 上へ</button>
-                        <input type="text" value="C:\Users\koueiwindows\Documents" style="flex: 1; padding: 4px; border: 1px solid #999; border-radius: 2px;">
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div style="background: #f0f0f0; padding: 8px; border-bottom: 1px solid #ddd; display: flex; gap: 8px;">
+                        <button style="padding: 6px 12px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; border-radius: 2px; font-size: 12px;">← 戻る</button>
+                        <button style="padding: 6px 12px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; border-radius: 2px; font-size: 12px;">→ 進む</button>
+                        <input type="text" value="C:\Users\koueiwindows\Documents" style="flex: 1; padding: 4px; border: 1px solid #999; border-radius: 2px; font-size: 12px;">
                     </div>
-                    <div class="file-list">
-                        <div class="file-item">
-                            <span class="file-item-icon">📁</span>
-                            <span>Desktop</span>
+                    <div style="flex: 1; overflow-y: auto; padding: 10px;">
+                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
+                            <span style="font-size: 20px;">📁</span>
+                            <span style="font-size: 13px;">Desktop</span>
                         </div>
-                        <div class="file-item">
-                            <span class="file-item-icon">📁</span>
-                            <span>Downloads</span>
+                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
+                            <span style="font-size: 20px;">📁</span>
+                            <span style="font-size: 13px;">Downloads</span>
                         </div>
-                        <div class="file-item">
-                            <span class="file-item-icon">📁</span>
-                            <span>Documents</span>
+                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
+                            <span style="font-size: 20px;">📁</span>
+                            <span style="font-size: 13px;">Documents</span>
                         </div>
-                        <div class="file-item">
-                            <span class="file-item-icon">📁</span>
-                            <span>Pictures</span>
-                        </div>
-                        <div class="file-item">
-                            <span class="file-item-icon">📄</span>
-                            <span>readme.txt</span>
-                        </div>
-                        <div class="file-item">
-                            <span class="file-item-icon">📄</span>
-                            <span>notes.txt</span>
+                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
+                            <span style="font-size: 20px;">📄</span>
+                            <span style="font-size: 13px;">readme.txt</span>
                         </div>
                     </div>
                 </div>
@@ -551,31 +531,62 @@
                 </div>
             </div>
             <div class="window-content">
-                <div class="calculator">
-                    <div class="calc-display" id="calcDisplay">0</div>
-                    <button class="calc-btn" onclick="calcClear()">C</button>
-                    <button class="calc-btn" onclick="calcBackspace()">←</button>
-                    <button class="calc-btn" onclick="calcPercent()">%</button>
-                    <button class="calc-btn operator" onclick="calcOperator('/')">/</button>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px;">
+                    <div id="calcDisplay" style="grid-column: 1 / -1; background: #1e1e1e; color: #00ff00; padding: 10px; text-align: right; font-size: 20px; font-family: 'Courier New', monospace; margin-bottom: 10px; border-radius: 2px;">0</div>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcClear()">C</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcBackspace()">←</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcPercent()">%</button>
+                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('/')">/</button>
                     
-                    <button class="calc-btn" onclick="calcNumber('7')">7</button>
-                    <button class="calc-btn" onclick="calcNumber('8')">8</button>
-                    <button class="calc-btn" onclick="calcNumber('9')">9</button>
-                    <button class="calc-btn operator" onclick="calcOperator('*')">*</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('7')">7</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('8')">8</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('9')">9</button>
+                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('*')">*</button>
                     
-                    <button class="calc-btn" onclick="calcNumber('4')">4</button>
-                    <button class="calc-btn" onclick="calcNumber('5')">5</button>
-                    <button class="calc-btn" onclick="calcNumber('6')">6</button>
-                    <button class="calc-btn operator" onclick="calcOperator('-')">-</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('4')">4</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('5')">5</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('6')">6</button>
+                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('-')">-</button>
                     
-                    <button class="calc-btn" onclick="calcNumber('1')">1</button>
-                    <button class="calc-btn" onclick="calcNumber('2')">2</button>
-                    <button class="calc-btn" onclick="calcNumber('3')">3</button>
-                    <button class="calc-btn operator" onclick="calcOperator('+')">+</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('1')">1</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('2')">2</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('3')">3</button>
+                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('+')">+</button>
                     
-                    <button class="calc-btn" onclick="calcNumber('0')" style="grid-column: 1 / 3;">0</button>
-                    <button class="calc-btn" onclick="calcNumber('.')">.</button>
-                    <button class="calc-btn equals" onclick="calcEquals()">=</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px; grid-column: 1 / 3;" onclick="calcNumber('0')">0</button>
+                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('.')">.</button>
+                    <button style="padding: 15px; background: #107c10; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px; grid-column: 1 / -1;" onclick="calcEquals()">=</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- To-Do List -->
+        <div class="window" id="todolist" style="width: 550px; height: 500px; top: 250px; left: 550px;">
+            <div class="window-title">
+                <span>✓ タスク管理</span>
+                <div class="window-buttons">
+                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
+                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
+                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="todolist-container">
+                    <div class="todo-input-section">
+                        <input type="text" id="todoInput" class="todo-input" placeholder="新しいタスクを追加..." autocomplete="off">
+                        <select id="todoPriority" class="todo-priority-select">
+                            <option value="low">低</option>
+                            <option value="medium" selected>中</option>
+                            <option value="high">高</option>
+                        </select>
+                        <button class="todo-add-btn" onclick="addTodoTask()">追加</button>
+                    </div>
+                    <div class="todo-stats">
+                        <span>合計: <strong id="todoTotal">0</strong></span>
+                        <span>完了: <strong id="todoDone">0</strong></span>
+                        <span>未完: <strong id="todoPending">0</strong></span>
+                    </div>
+                    <div class="todo-list" id="todoListContainer"></div>
                 </div>
             </div>
         </div>
@@ -590,37 +601,37 @@
                     <button class="window-btn close" onclick="closeWindow(this)">✕</button>
                 </div>
             </div>
-            <div class="window-content">
-                <div class="settings-content">
-                    <div class="setting-section">
-                        <h3>表示設定</h3>
-                        <div class="setting-item">
+            <div class="window-content" style="overflow-y: auto;">
+                <div style="padding: 15px;">
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">表示設定</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>ダークモード</label>
                             <input type="checkbox">
                         </div>
-                        <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>高コントラスト</label>
                             <input type="checkbox">
                         </div>
-                        <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>画面の明るさ</label>
-                            <input type="range" class="slider" min="0" max="100" value="80">
+                            <input type="range" min="0" max="100" value="80" style="width: 100px;">
                         </div>
                     </div>
-                    <div class="setting-section">
-                        <h3>サウンド設定</h3>
-                        <div class="setting-item">
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">サウンド設定</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>通知音</label>
                             <input type="checkbox" checked>
                         </div>
-                        <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>ボリューム</label>
-                            <input type="range" class="slider" min="0" max="100" value="70">
+                            <input type="range" min="0" max="100" value="70" style="width: 100px;">
                         </div>
                     </div>
-                    <div class="setting-section">
-                        <h3>その他</h3>
-                        <div class="setting-item">
+                    <div>
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">その他</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
                             <label>言語</label>
                             <select style="padding: 4px; border: 1px solid #999; border-radius: 2px;">
                                 <option>日本語</option>
@@ -641,6 +652,7 @@
             <div class="taskbar-app" onclick="toggleWindow('notepad')" id="taskbar-notepad" title="メモ帳">📝</div>
             <div class="taskbar-app" onclick="toggleWindow('explorer')" id="taskbar-explorer" title="ファイルエクスプローラー">📁</div>
             <div class="taskbar-app" onclick="toggleWindow('calculator')" id="taskbar-calculator" title="電卓">🧮</div>
+            <div class="taskbar-app" onclick="toggleWindow('todolist')" id="taskbar-todolist" title="タスク管理">✓</div>
             <div class="taskbar-app" onclick="toggleWindow('settings')" id="taskbar-settings" title="設定">⚙️</div>
         </div>
         <div class="taskbar-end">
@@ -654,8 +666,9 @@
         let calcOperator = null;
         let calcPrevValue = null;
         let calcNewValue = true;
+        let todos = [];
 
-        // ウィンドウ管理
+        // ========== ウィンドウ管理 ==========
         function openWindow(id) {
             const window = document.getElementById(id);
             window.classList.add('active');
@@ -700,7 +713,7 @@
             updateTaskbar();
         }
 
-        // ドラッグ機能
+        // ========== ドラッグ機能 ==========
         let dragElement = null;
         let offsetX = 0;
         let offsetY = 0;
@@ -726,7 +739,7 @@
             dragElement = null;
         });
 
-        // スタートメニュー
+        // ========== スタートメニュー ==========
         function toggleStartMenu() {
             const menu = document.getElementById('startMenu');
             menu.classList.toggle('active');
@@ -743,9 +756,9 @@
             }
         });
 
-        // タスクバー更新
+        // ========== タスクバー更新 ==========
         function updateTaskbar() {
-            ['notepad', 'explorer', 'calculator', 'settings'].forEach(id => {
+            ['notepad', 'explorer', 'calculator', 'todolist', 'settings'].forEach(id => {
                 const window = document.getElementById(id);
                 const taskbarBtn = document.getElementById(`taskbar-${id}`);
                 if (window.classList.contains('active')) {
@@ -756,7 +769,7 @@
             });
         }
 
-        // 計算機機能
+        // ========== 計算機機能 ==========
         function calcNumber(num) {
             if (calcNewValue) {
                 calcValue = num;
@@ -816,7 +829,89 @@
             document.getElementById('calcDisplay').textContent = calcValue;
         }
 
-        // 時計
+        // ========== To-Do List機能 ==========
+        function loadTodos() {
+            const saved = localStorage.getItem('desktopTodos');
+            if (saved) {
+                todos = JSON.parse(saved);
+            }
+            renderTodoList();
+        }
+
+        function saveTodos() {
+            localStorage.setItem('desktopTodos', JSON.stringify(todos));
+        }
+
+        function addTodoTask() {
+            const input = document.getElementById('todoInput');
+            const priority = document.getElementById('todoPriority').value;
+            const text = input.value.trim();
+
+            if (text === '') {
+                return;
+            }
+
+            const todo = {
+                id: Date.now(),
+                text: text,
+                completed: false,
+                priority: priority
+            };
+
+            todos.unshift(todo);
+            input.value = '';
+            input.focus();
+            saveTodos();
+            renderTodoList();
+        }
+
+        function toggleTodoItem(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos();
+                renderTodoList();
+            }
+        }
+
+        function deleteTodoItem(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+            renderTodoList();
+        }
+
+        function renderTodoList() {
+            const container = document.getElementById('todoListContainer');
+            const total = todos.length;
+            const done = todos.filter(t => t.completed).length;
+            const pending = total - done;
+
+            document.getElementById('todoTotal').textContent = total;
+            document.getElementById('todoDone').textContent = done;
+            document.getElementById('todoPending').textContent = pending;
+
+            if (todos.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #999;"><div style="font-size: 36px; margin-bottom: 10px;">✨</div><div>タスクはありません</div></div>';
+                return;
+            }
+
+            container.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodoItem(${todo.id})">
+                    <div class="todo-text">${escapeHtml(todo.text)}</div>
+                    <span class="todo-priority-tag ${todo.priority}">${todo.priority}</span>
+                    <button class="todo-delete-btn" onclick="deleteTodoItem(${todo.id})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========== 時計 ==========
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -826,6 +921,15 @@
 
         setInterval(updateClock, 1000);
         updateClock();
+
+        // ========== 初期化 ==========
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodoTask();
+            }
+        });
+
+        loadTodos();
     </script>
 </body>
 </html>
