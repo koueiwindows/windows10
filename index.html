@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 11 Desktop</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -19,11 +16,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden;
             height: 100vh;
-        }
-
-        #root {
-            width: 100%;
-            height: 100%;
+            color: white;
         }
 
         .desktop-container {
@@ -100,8 +93,8 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
-            min-width: 400px;
-            min-height: 300px;
+            min-width: 450px;
+            min-height: 350px;
             z-index: 100;
             color: white;
             animation: slideIn 0.3s ease-out;
@@ -118,7 +111,7 @@
             }
         }
 
-        .window.minimized {
+        .window.hidden {
             display: none !important;
         }
 
@@ -208,6 +201,7 @@
             border-radius: 8px;
             transition: all 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0;
         }
 
         .taskbar-app:hover {
@@ -293,6 +287,10 @@
             color: white;
             border-radius: 8px;
             margin-bottom: 4px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
 
         .start-menu-item:hover {
@@ -474,6 +472,7 @@
             justify-content: center;
             height: 100%;
             color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
         }
 
         .empty-state-icon {
@@ -481,7 +480,7 @@
             margin-bottom: 12px;
         }
 
-        /* その他アプリ */
+        /* メモ帳 */
         .notepad-textarea {
             width: 100%;
             height: 100%;
@@ -505,6 +504,7 @@
             color: rgba(255, 255, 255, 0.3);
         }
 
+        /* 計算機 */
         .calculator {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -581,211 +581,228 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="desktop-container">
+        <div class="desktop-area">
+            <!-- デスクトップアイコン -->
+            <div class="desktop-icons">
+                <div class="desktop-icon" ondblclick="openWindow('notepad')">
+                    <div class="desktop-icon-image">📝</div>
+                    <div class="desktop-icon-label">メモ帳</div>
+                </div>
+                <div class="desktop-icon" ondblclick="openWindow('calculator')">
+                    <div class="desktop-icon-image">🧮</div>
+                    <div class="desktop-icon-label">計算機</div>
+                </div>
+                <div class="desktop-icon" ondblclick="openWindow('todolist')">
+                    <div class="desktop-icon-image">✓</div>
+                    <div class="desktop-icon-label">タスク</div>
+                </div>
+            </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+            <!-- スタートメニュー -->
+            <div class="start-menu" id="startMenu">
+                <div class="start-menu-header">👤 Windows 11</div>
+                <div class="start-menu-items">
+                    <button class="start-menu-item" onclick="openWindow('notepad'); closeStartMenu()">
+                        <span class="start-menu-item-icon">📝</span>
+                        <span>メモ帳</span>
+                    </button>
+                    <button class="start-menu-item" onclick="openWindow('calculator'); closeStartMenu()">
+                        <span class="start-menu-item-icon">🧮</span>
+                        <span>計算機</span>
+                    </button>
+                    <button class="start-menu-item" onclick="openWindow('todolist'); closeStartMenu()">
+                        <span class="start-menu-item-icon">✓</span>
+                        <span>タスク管理</span>
+                    </button>
+                </div>
+            </div>
 
-        function Window({ id, title, children, onClose, onMinimize, position, zIndex, minimized }) {
-            const [pos, setPos] = useState(position);
-            const [isDragging, setIsDragging] = useState(false);
-            const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-            const titleRef = useRef(null);
+            <!-- ウィンドウ -->
+            <!-- メモ帳 -->
+            <div class="window hidden" id="notepadWindow" style="width: 600px; height: 400px; left: 100px; top: 100px;">
+                <div class="window-title">
+                    <span>📝 メモ帳</span>
+                    <div class="window-buttons">
+                        <button class="window-btn" onclick="minimizeWindow('notepadWindow')">_</button>
+                        <button class="window-btn" onclick="minimizeWindow('notepadWindow')">□</button>
+                        <button class="window-btn close" onclick="closeWindow('notepadWindow')">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <textarea class="notepad-textarea" id="notepadText" placeholder="ここに入力..."></textarea>
+                </div>
+            </div>
 
-            const handleMouseDown = (e) => {
-                if (titleRef.current && titleRef.current.contains(e.target)) {
-                    setIsDragging(true);
-                    setDragOffset({
-                        x: e.clientX - pos.x,
-                        y: e.clientY - pos.y
-                    });
-                }
-            };
+            <!-- 計算機 -->
+            <div class="window hidden" id="calculatorWindow" style="width: 350px; height: 450px; left: 400px; top: 150px;">
+                <div class="window-title">
+                    <span>🧮 計算機</span>
+                    <div class="window-buttons">
+                        <button class="window-btn" onclick="minimizeWindow('calculatorWindow')">_</button>
+                        <button class="window-btn" onclick="minimizeWindow('calculatorWindow')">□</button>
+                        <button class="window-btn close" onclick="closeWindow('calculatorWindow')">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="calculator" id="calculator"></div>
+                </div>
+            </div>
 
-            useEffect(() => {
-                const handleMouseMove = (e) => {
-                    if (isDragging) {
-                        setPos({
-                            x: e.clientX - dragOffset.x,
-                            y: e.clientY - dragOffset.y
-                        });
-                    }
-                };
-
-                const handleMouseUp = () => {
-                    setIsDragging(false);
-                };
-
-                if (isDragging) {
-                    document.addEventListener('mousemove', handleMouseMove);
-                    document.addEventListener('mouseup', handleMouseUp);
-                }
-
-                return () => {
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                };
-            }, [isDragging, dragOffset]);
-
-            return (
-                <div
-                    className={`window ${minimized ? 'minimized' : ''}`}
-                    style={{
-                        left: `${pos.x}px`,
-                        top: `${pos.y}px`,
-                        zIndex: zIndex,
-                    }}
-                >
-                    <div className="window-title" ref={titleRef} onMouseDown={handleMouseDown}>
-                        <span>{title}</span>
-                        <div className="window-buttons">
-                            <button className="window-btn" onClick={onMinimize}>_</button>
-                            <button className="window-btn" onClick={onMinimize}>□</button>
-                            <button className="window-btn close" onClick={onClose}>✕</button>
+            <!-- To-Do List -->
+            <div class="window hidden" id="todolistWindow" style="width: 550px; height: 500px; left: 700px; top: 200px;">
+                <div class="window-title">
+                    <span>✓ タスク</span>
+                    <div class="window-buttons">
+                        <button class="window-btn" onclick="minimizeWindow('todolistWindow')">_</button>
+                        <button class="window-btn" onclick="minimizeWindow('todolistWindow')">□</button>
+                        <button class="window-btn close" onclick="closeWindow('todolistWindow')">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="todolist-container">
+                        <div class="todo-input-section">
+                            <input type="text" class="todo-input" id="todoInput" placeholder="新しいタスク..." autocomplete="off">
+                            <select class="todo-priority-select" id="todoPriority">
+                                <option value="low">低</option>
+                                <option value="medium" selected>中</option>
+                                <option value="high">高</option>
+                            </select>
+                            <button class="todo-add-btn" onclick="addTodo()">追加</button>
                         </div>
-                    </div>
-                    <div className="window-content">
-                        {children}
-                    </div>
-                </div>
-            );
-        }
-
-        function TodoApp() {
-            const [todos, setTodos] = useState([]);
-            const [input, setInput] = useState('');
-            const [priority, setPriority] = useState('medium');
-
-            useEffect(() => {
-                const saved = localStorage.getItem('win11Todos');
-                if (saved) {
-                    setTodos(JSON.parse(saved));
-                }
-            }, []);
-
-            const saveTodos = (newTodos) => {
-                setTodos(newTodos);
-                localStorage.setItem('win11Todos', JSON.stringify(newTodos));
-            };
-
-            const addTodo = () => {
-                if (input.trim() === '') return;
-                const newTodo = {
-                    id: Date.now(),
-                    text: input,
-                    completed: false,
-                    priority: priority
-                };
-                saveTodos([newTodo, ...todos]);
-                setInput('');
-            };
-
-            const toggleTodo = (id) => {
-                saveTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-            };
-
-            const deleteTodo = (id) => {
-                saveTodos(todos.filter(t => t.id !== id));
-            };
-
-            const total = todos.length;
-            const done = todos.filter(t => t.completed).length;
-            const pending = total - done;
-
-            return (
-                <div className="todolist-container">
-                    <div className="todo-input-section">
-                        <input
-                            type="text"
-                            className="todo-input"
-                            placeholder="新しいタスク..."
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && addTodo()}
-                        />
-                        <select className="todo-priority-select" value={priority} onChange={(e) => setPriority(e.target.value)}>
-                            <option value="low">低</option>
-                            <option value="medium">中</option>
-                            <option value="high">高</option>
-                        </select>
-                        <button className="todo-add-btn" onClick={addTodo}>追加</button>
-                    </div>
-                    <div className="todo-stats">
-                        <div className="todo-stat">合計: <strong>{total}</strong></div>
-                        <div className="todo-stat">完了: <strong>{done}</strong></div>
-                        <div className="todo-stat">未完: <strong>{pending}</strong></div>
-                    </div>
-                    <div className="todo-list">
-                        {todos.length === 0 ? (
-                            <div className="empty-state">
-                                <div className="empty-state-icon">✨</div>
-                                <div>タスクなし</div>
-                            </div>
-                        ) : (
-                            todos.map(todo => (
-                                <div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-                                    <input
-                                        type="checkbox"
-                                        className="todo-checkbox"
-                                        checked={todo.completed}
-                                        onChange={() => toggleTodo(todo.id)}
-                                    />
-                                    <div className="todo-text">{todo.text}</div>
-                                    <span className={`todo-priority-tag ${todo.priority}`}>{todo.priority}</span>
-                                    <button className="todo-delete-btn" onClick={() => deleteTodo(todo.id)}>✕</button>
-                                </div>
-                            ))
-                        )}
+                        <div class="todo-stats">
+                            <div class="todo-stat">合計: <strong id="todoTotal">0</strong></div>
+                            <div class="todo-stat">完了: <strong id="todoDone">0</strong></div>
+                            <div class="todo-stat">未完: <strong id="todoPending">0</strong></div>
+                        </div>
+                        <div class="todo-list" id="todoListContainer"></div>
                     </div>
                 </div>
-            );
+            </div>
+        </div>
+
+        <!-- タスクバー -->
+        <div class="taskbar">
+            <div class="taskbar-apps">
+                <button class="taskbar-app" onclick="toggleStartMenu()" title="スタート">⊞</button>
+                <button class="taskbar-app" id="taskbarNotepad" onclick="toggleWindow('notepadWindow')" title="メモ帳">📝</button>
+                <button class="taskbar-app" id="taskbarCalculator" onclick="toggleWindow('calculatorWindow')" title="計算機">🧮</button>
+                <button class="taskbar-app" id="taskbarTodolist" onclick="toggleWindow('todolistWindow')" title="タスク">✓</button>
+            </div>
+            <div class="taskbar-end">
+                <div class="clock" id="clock">12:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+        let calcDisplay = '0';
+        let calcOperator = null;
+        let calcPrevValue = null;
+        let calcNewNumber = true;
+        let currentZ = 100;
+
+        // ========== ウィンドウ管理 ==========
+        function openWindow(windowId) {
+            const window = document.getElementById(windowId + 'Window');
+            if (window) {
+                window.classList.remove('hidden');
+                window.style.zIndex = ++currentZ;
+                updateTaskbar();
+            }
         }
 
-        function Calculator() {
-            const [display, setDisplay] = useState('0');
-            const [prevValue, setPrevValue] = useState(null);
-            const [operator, setOperator] = useState(null);
-            const [newNumber, setNewNumber] = useState(true);
+        function closeWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.classList.add('hidden');
+            updateTaskbar();
+        }
 
-            const handleNumber = (num) => {
-                if (newNumber) {
-                    setDisplay(String(num));
-                    setNewNumber(false);
-                } else {
-                    setDisplay(display === '0' ? String(num) : display + num);
-                }
-            };
+        function minimizeWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.classList.add('hidden');
+            updateTaskbar();
+        }
 
-            const handleOperator = (op) => {
-                setPrevValue(parseFloat(display));
-                setOperator(op);
-                setNewNumber(true);
-            };
+        function toggleWindow(windowId) {
+            const window = document.getElementById(windowId);
+            if (window.classList.contains('hidden')) {
+                window.classList.remove('hidden');
+                window.style.zIndex = ++currentZ;
+            } else {
+                window.classList.add('hidden');
+            }
+            updateTaskbar();
+        }
 
-            const handleEquals = () => {
-                if (operator && prevValue !== null) {
-                    const curr = parseFloat(display);
-                    let result = 0;
-                    switch (operator) {
-                        case '+': result = prevValue + curr; break;
-                        case '-': result = prevValue - curr; break;
-                        case '*': result = prevValue * curr; break;
-                        case '/': result = prevValue / curr; break;
-                    }
-                    setDisplay(String(result));
-                    setPrevValue(null);
-                    setOperator(null);
-                    setNewNumber(true);
-                }
-            };
+        // ========== ドラッグ機能 ==========
+        let dragElement = null;
+        let offsetX = 0;
+        let offsetY = 0;
 
-            const handleClear = () => {
-                setDisplay('0');
-                setPrevValue(null);
-                setOperator(null);
-                setNewNumber(true);
-            };
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.window-title')) {
+                dragElement = e.target.closest('.window');
+                dragElement.style.zIndex = ++currentZ;
+                const rect = dragElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            }
+        });
 
+        document.addEventListener('mousemove', (e) => {
+            if (dragElement) {
+                dragElement.style.left = (e.clientX - offsetX) + 'px';
+                dragElement.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            dragElement = null;
+        });
+
+        // ========== スタートメニュー ==========
+        function toggleStartMenu() {
+            const menu = document.getElementById('startMenu');
+            menu.classList.toggle('active');
+        }
+
+        function closeStartMenu() {
+            const menu = document.getElementById('startMenu');
+            menu.classList.remove('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.start-menu-item') && !e.target.closest('.taskbar-app')) {
+                closeStartMenu();
+            }
+        });
+
+        // ========== タスクバー更新 ==========
+        function updateTaskbar() {
+            const notepadWindow = document.getElementById('notepadWindow');
+            const calculatorWindow = document.getElementById('calculatorWindow');
+            const todolistWindow = document.getElementById('todolistWindow');
+
+            document.getElementById('taskbarNotepad').classList.toggle('active', !notepadWindow.classList.contains('hidden'));
+            document.getElementById('taskbarCalculator').classList.toggle('active', !calculatorWindow.classList.contains('hidden'));
+            document.getElementById('taskbarTodolist').classList.toggle('active', !todolistWindow.classList.contains('hidden'));
+        }
+
+        // ========== 時計 ==========
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ========== 計算機 ==========
+        function createCalculator() {
             const buttons = [
                 ['C', '←', '%', '/'],
                 ['7', '8', '9', '*'],
@@ -794,168 +811,142 @@
                 ['0', '.', '=']
             ];
 
-            return (
-                <div className="calculator">
-                    <div className="calc-display">{display}</div>
-                    {buttons.map((row, i) => (
-                        row.map((btn, j) => (
-                            <button
-                                key={`${i}-${j}`}
-                                className={`calc-btn ${['/', '*', '-', '+'].includes(btn) ? 'operator' : ''} ${btn === '=' ? 'equals' : ''}`}
-                                onClick={() => {
-                                    if (btn === 'C') handleClear();
-                                    else if (btn === '←') setDisplay(display.slice(0, -1) || '0');
-                                    else if (btn === '%') setDisplay(String(parseFloat(display) / 100));
-                                    else if (['+', '-', '*', '/'].includes(btn)) handleOperator(btn);
-                                    else if (btn === '=') handleEquals();
-                                    else handleNumber(btn);
-                                }}
-                                style={btn === '0' ? { gridColumn: '1 / 3' } : {}}
-                            >
-                                {btn}
-                            </button>
-                        ))
-                    ))}
-                </div>
-            );
+            const container = document.getElementById('calculator');
+            container.innerHTML = '<div class="calc-display" id="calcDisplay">0</div>';
+
+            buttons.forEach((row, rowIdx) => {
+                row.forEach((btn, colIdx) => {
+                    const button = document.createElement('button');
+                    button.className = `calc-btn ${['/', '*', '-', '+'].includes(btn) ? 'operator' : ''} ${btn === '=' ? 'equals' : ''}`;
+                    button.textContent = btn;
+                    if (btn === '0') button.style.gridColumn = '1 / 3';
+                    button.onclick = () => handleCalcButton(btn);
+                    container.appendChild(button);
+                });
+            });
         }
 
-        function Desktop() {
-            const [windows, setWindows] = useState([
-                { id: 'notepad', title: '📝 メモ帳', visible: false, minimized: false, position: { x: 100, y: 100 } },
-                { id: 'calculator', title: '🧮 計算機', visible: false, minimized: false, position: { x: 400, y: 150 } },
-                { id: 'todolist', title: '✓ タスク', visible: false, minimized: false, position: { x: 700, y: 200 } },
-            ]);
-            const [startMenuOpen, setStartMenuOpen] = useState(false);
-            const [clock, setClock] = useState(new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
-            const [zIndex, setZIndex] = useState(100);
-            const [notepadContent, setNotepadContent] = useState('');
+        function handleCalcButton(btn) {
+            const display = document.getElementById('calcDisplay');
 
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    setClock(new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
-                }, 1000);
-                return () => clearInterval(timer);
-            }, []);
-
-            const toggleWindow = (id) => {
-                setWindows(windows.map(w =>
-                    w.id === id ? { ...w, visible: !w.visible, minimized: false } : w
-                ));
-                setZIndex(zIndex + 1);
-                setStartMenuOpen(false);
-            };
-
-            const closeWindow = (id) => {
-                setWindows(windows.map(w => w.id === id ? { ...w, visible: false } : w));
-            };
-
-            const minimizeWindow = (id) => {
-                setWindows(windows.map(w => w.id === id ? { ...w, minimized: !w.minimized } : w));
-            };
-
-            const openWindow = (id) => {
-                setWindows(windows.map(w => w.id === id ? { ...w, visible: true, minimized: false } : w));
-                setStartMenuOpen(false);
-                setZIndex(zIndex + 1);
-            };
-
-            const getWindowContent = (id) => {
-                switch (id) {
-                    case 'notepad':
-                        return <textarea className="notepad-textarea" placeholder="ここに入力..." value={notepadContent} onChange={(e) => setNotepadContent(e.target.value)} />;
-                    case 'calculator':
-                        return <Calculator />;
-                    case 'todolist':
-                        return <TodoApp />;
-                    default:
-                        return null;
+            if (btn === 'C') {
+                calcDisplay = '0';
+                calcOperator = null;
+                calcPrevValue = null;
+                calcNewNumber = true;
+            } else if (btn === '←') {
+                calcDisplay = calcDisplay.slice(0, -1) || '0';
+            } else if (btn === '%') {
+                calcDisplay = String(parseFloat(calcDisplay) / 100);
+            } else if (['+', '-', '*', '/'].includes(btn)) {
+                calcPrevValue = parseFloat(calcDisplay);
+                calcOperator = btn;
+                calcNewNumber = true;
+            } else if (btn === '=') {
+                if (calcOperator && calcPrevValue !== null) {
+                    const curr = parseFloat(calcDisplay);
+                    let result = 0;
+                    switch (calcOperator) {
+                        case '+': result = calcPrevValue + curr; break;
+                        case '-': result = calcPrevValue - curr; break;
+                        case '*': result = calcPrevValue * curr; break;
+                        case '/': result = calcPrevValue / curr; break;
+                    }
+                    calcDisplay = String(result);
+                    calcOperator = null;
+                    calcPrevValue = null;
+                    calcNewNumber = true;
                 }
-            };
+            } else {
+                if (calcNewNumber) {
+                    calcDisplay = btn;
+                    calcNewNumber = false;
+                } else {
+                    calcDisplay = calcDisplay === '0' ? btn : calcDisplay + btn;
+                }
+            }
 
-            return (
-                <div className="desktop-container">
-                    <div className="desktop-area">
-                        <div className="desktop-icons">
-                            <div className="desktop-icon" onDoubleClick={() => openWindow('notepad')}>
-                                <div className="desktop-icon-image">📝</div>
-                                <div className="desktop-icon-label">メモ帳</div>
-                            </div>
-                            <div className="desktop-icon" onDoubleClick={() => openWindow('calculator')}>
-                                <div className="desktop-icon-image">🧮</div>
-                                <div className="desktop-icon-label">計算機</div>
-                            </div>
-                            <div className="desktop-icon" onDoubleClick={() => openWindow('todolist')}>
-                                <div className="desktop-icon-image">✓</div>
-                                <div className="desktop-icon-label">タスク</div>
-                            </div>
-                        </div>
-
-                        {windows.filter(w => w.visible).map((w, idx) => (
-                            <Window
-                                key={w.id}
-                                id={w.id}
-                                title={w.title}
-                                position={w.position}
-                                zIndex={zIndex - windows.length + idx}
-                                minimized={w.minimized}
-                                onClose={() => closeWindow(w.id)}
-                                onMinimize={() => minimizeWindow(w.id)}
-                            >
-                                {getWindowContent(w.id)}
-                            </Window>
-                        ))}
-
-                        {startMenuOpen && (
-                            <div className="start-menu active">
-                                <div className="start-menu-header">👤 Windows 11</div>
-                                <div className="start-menu-items">
-                                    <div className="start-menu-item" onClick={() => openWindow('notepad')}>
-                                        <span className="start-menu-item-icon">📝</span>
-                                        <span>メモ帳</span>
-                                    </div>
-                                    <div className="start-menu-item" onClick={() => openWindow('calculator')}>
-                                        <span className="start-menu-item-icon">🧮</span>
-                                        <span>計算機</span>
-                                    </div>
-                                    <div className="start-menu-item" onClick={() => openWindow('todolist')}>
-                                        <span className="start-menu-item-icon">✓</span>
-                                        <span>タスク管理</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="taskbar">
-                        <div className="taskbar-apps">
-                            <button
-                                className="taskbar-app"
-                                onClick={() => setStartMenuOpen(!startMenuOpen)}
-                                title="スタート"
-                            >
-                                ⊞
-                            </button>
-                            {windows.map(w => (
-                                <button
-                                    key={w.id}
-                                    className={`taskbar-app ${w.visible && !w.minimized ? 'active' : ''}`}
-                                    onClick={() => toggleWindow(w.id)}
-                                    title={w.title}
-                                >
-                                    {w.title.split(' ')[0]}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="taskbar-end">
-                            <div className="clock">{clock}</div>
-                        </div>
-                    </div>
-                </div>
-            );
+            display.textContent = calcDisplay;
         }
 
-        ReactDOM.render(<Desktop />, document.getElementById('root'));
+        // ========== To-Do List ==========
+        function loadTodos() {
+            const saved = localStorage.getItem('win11Todos');
+            if (saved) {
+                todos = JSON.parse(saved);
+            }
+            renderTodos();
+        }
+
+        function saveTodos() {
+            localStorage.setItem('win11Todos', JSON.stringify(todos));
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const priority = document.getElementById('todoPriority').value;
+            const text = input.value.trim();
+
+            if (text === '') return;
+
+            todos.unshift({
+                id: Date.now(),
+                text: text,
+                completed: false,
+                priority: priority
+            });
+
+            input.value = '';
+            input.focus();
+            saveTodos();
+            renderTodos();
+        }
+
+        function toggleTodo(id) {
+            todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveTodos();
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+            renderTodos();
+        }
+
+        function renderTodos() {
+            const container = document.getElementById('todoListContainer');
+            const total = todos.length;
+            const done = todos.filter(t => t.completed).length;
+            const pending = total - done;
+
+            document.getElementById('todoTotal').textContent = total;
+            document.getElementById('todoDone').textContent = done;
+            document.getElementById('todoPending').textContent = pending;
+
+            if (todos.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><div>タスクなし</div></div>';
+                return;
+            }
+
+            container.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})">
+                    <div class="todo-text">${todo.text}</div>
+                    <span class="todo-priority-tag ${todo.priority}">${todo.priority}</span>
+                    <button class="todo-delete-btn" onclick="deleteTodo(${todo.id})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // ========== Enter キー対応 ==========
+        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // ========== 初期化 ==========
+        createCalculator();
+        loadTodos();
     </script>
 </body>
 </html>
