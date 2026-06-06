@@ -169,6 +169,71 @@
             background: rgba(32, 32, 32, 0.5);
         }
 
+        /* ブラウザウィンドウ */
+        .browser-window {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .browser-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(45, 45, 45, 0.7);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .browser-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .browser-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .url-bar {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .url-bar:focus {
+            outline: none;
+            border-color: rgba(0, 120, 212, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .browser-content {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .browser-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
         /* タスクバー */
         .taskbar {
             height: 56px;
@@ -187,6 +252,7 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            overflow-x: auto;
         }
 
         .taskbar-app {
@@ -202,6 +268,7 @@
             transition: all 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 0;
+            flex-shrink: 0;
         }
 
         .taskbar-app:hover {
@@ -597,6 +664,10 @@
                     <div class="desktop-icon-image">✓</div>
                     <div class="desktop-icon-label">タスク</div>
                 </div>
+                <div class="desktop-icon" ondblclick="openWindow('google')">
+                    <div class="desktop-icon-image">🔍</div>
+                    <div class="desktop-icon-label">Google</div>
+                </div>
             </div>
 
             <!-- スタートメニュー -->
@@ -614,6 +685,10 @@
                     <button class="start-menu-item" onclick="openWindow('todolist'); closeStartMenu()">
                         <span class="start-menu-item-icon">✓</span>
                         <span>タスク管理</span>
+                    </button>
+                    <button class="start-menu-item" onclick="openWindow('google'); closeStartMenu()">
+                        <span class="start-menu-item-icon">🔍</span>
+                        <span>Google 検索</span>
                     </button>
                 </div>
             </div>
@@ -679,6 +754,31 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Google -->
+            <div class="window hidden" id="googleWindow" style="width: 900px; height: 600px; left: 300px; top: 100px;">
+                <div class="window-title">
+                    <span>🔍 Google 検索</span>
+                    <div class="window-buttons">
+                        <button class="window-btn" onclick="minimizeWindow('googleWindow')">_</button>
+                        <button class="window-btn" onclick="minimizeWindow('googleWindow')">□</button>
+                        <button class="window-btn close" onclick="closeWindow('googleWindow')">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="browser-window">
+                        <div class="browser-toolbar">
+                            <button class="browser-btn" onclick="googleGoBack()">←</button>
+                            <button class="browser-btn" onclick="googleGoForward()">→</button>
+                            <button class="browser-btn" onclick="googleRefresh()">🔄</button>
+                            <input type="text" class="url-bar" id="googleUrl" value="https://www.google.com" readonly>
+                        </div>
+                        <div class="browser-content">
+                            <iframe id="googleFrame" src="https://www.google.com" title="Google"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- タスクバー -->
@@ -688,6 +788,7 @@
                 <button class="taskbar-app" id="taskbarNotepad" onclick="toggleWindow('notepadWindow')" title="メモ帳">📝</button>
                 <button class="taskbar-app" id="taskbarCalculator" onclick="toggleWindow('calculatorWindow')" title="計算機">🧮</button>
                 <button class="taskbar-app" id="taskbarTodolist" onclick="toggleWindow('todolistWindow')" title="タスク">✓</button>
+                <button class="taskbar-app" id="taskbarGoogle" onclick="toggleWindow('googleWindow')" title="Google">🔍</button>
             </div>
             <div class="taskbar-end">
                 <div class="clock" id="clock">12:00</div>
@@ -784,10 +885,12 @@
             const notepadWindow = document.getElementById('notepadWindow');
             const calculatorWindow = document.getElementById('calculatorWindow');
             const todolistWindow = document.getElementById('todolistWindow');
+            const googleWindow = document.getElementById('googleWindow');
 
             document.getElementById('taskbarNotepad').classList.toggle('active', !notepadWindow.classList.contains('hidden'));
             document.getElementById('taskbarCalculator').classList.toggle('active', !calculatorWindow.classList.contains('hidden'));
             document.getElementById('taskbarTodolist').classList.toggle('active', !todolistWindow.classList.contains('hidden'));
+            document.getElementById('taskbarGoogle').classList.toggle('active', !googleWindow.classList.contains('hidden'));
         }
 
         // ========== 時計 ==========
@@ -800,6 +903,22 @@
 
         setInterval(updateClock, 1000);
         updateClock();
+
+        // ========== Google ブラウザ ==========
+        function googleGoBack() {
+            const frame = document.getElementById('googleFrame');
+            frame.src = 'https://www.google.com';
+        }
+
+        function googleGoForward() {
+            const frame = document.getElementById('googleFrame');
+            frame.src = 'https://www.google.com';
+        }
+
+        function googleRefresh() {
+            const frame = document.getElementById('googleFrame');
+            frame.src = frame.src;
+        }
 
         // ========== 計算機 ==========
         function createCalculator() {
