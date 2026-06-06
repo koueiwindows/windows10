@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 10 Desktop</title>
+    <title>Windows 11 Desktop</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,19 +15,29 @@
         }
 
         body {
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%230078d4" width="1920" height="1080"/></svg>');
-            background-size: cover;
-            background-color: #0078d4;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden;
             height: 100vh;
-            user-select: none;
         }
 
-        .desktop {
+        #root {
+            width: 100%;
+            height: 100%;
+        }
+
+        .desktop-container {
             width: 100%;
             height: 100%;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .desktop-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
         }
 
         /* デスクトップアイコン */
@@ -35,6 +48,7 @@
             display: flex;
             flex-direction: column;
             gap: 30px;
+            z-index: 10;
         }
 
         .desktop-icon {
@@ -45,6 +59,11 @@
             cursor: pointer;
             width: 80px;
             text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .desktop-icon:hover {
+            transform: scale(1.05);
         }
 
         .desktop-icon-image {
@@ -53,51 +72,69 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            transition: background 0.2s;
+            font-size: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
         }
 
         .desktop-icon:hover .desktop-icon-image {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .desktop-icon-label {
             color: white;
             font-size: 12px;
             font-weight: 500;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         /* ウィンドウ */
         .window {
             position: absolute;
-            background: #f3f3f3;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: none;
+            background: rgba(32, 32, 32, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
             flex-direction: column;
             min-width: 400px;
             min-height: 300px;
             z-index: 100;
+            color: white;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .window.active {
-            display: flex;
-            z-index: 1000;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .window.minimized {
+            display: none !important;
         }
 
         .window-title {
-            background: linear-gradient(90deg, #0078d4, #005a9e);
+            background: rgba(45, 45, 45, 0.7);
             color: white;
-            padding: 8px 12px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
             font-weight: 500;
             cursor: move;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px 12px 0 0;
+            user-select: none;
         }
 
         .window-title span {
@@ -106,25 +143,26 @@
 
         .window-buttons {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
 
         .window-btn {
-            width: 36px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
             border: none;
             color: white;
-            font-size: 16px;
-            transition: background 0.2s;
+            font-size: 14px;
+            transition: all 0.2s;
+            border-radius: 6px;
         }
 
         .window-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .window-btn.close:hover {
@@ -133,104 +171,97 @@
 
         .window-content {
             flex: 1;
-            padding: 12px;
+            padding: 16px;
             overflow: auto;
-            background: white;
+            background: rgba(32, 32, 32, 0.5);
         }
 
         /* タスクバー */
         .taskbar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 48px;
-            background: rgba(0,0,0,0.7);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            gap: 10px;
-            z-index: 10000;
-        }
-
-        .start-menu-btn {
-            width: 48px;
-            height: 48px;
+            height: 56px;
+            background: rgba(32, 32, 32, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            transition: background 0.2s;
-            border-radius: 2px;
-        }
-
-        .start-menu-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .taskbar-separator {
-            width: 1px;
-            height: 30px;
-            background: rgba(255,255,255,0.2);
+            gap: 12px;
+            z-index: 10000;
+            padding: 0 12px;
         }
 
         .taskbar-apps {
             display: flex;
-            gap: 8px;
-            flex: 1;
+            gap: 12px;
+            align-items: center;
         }
 
         .taskbar-app {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             cursor: pointer;
-            background: rgba(255,255,255,0.05);
-            border-radius: 2px;
-            transition: background 0.2s;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .taskbar-app:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .taskbar-app.active {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .taskbar-end {
             margin-left: auto;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             color: white;
             font-size: 12px;
         }
 
         .clock {
-            padding: 0 10px;
+            padding: 0 12px;
             text-align: right;
+            font-weight: 500;
         }
 
         /* スタートメニュー */
         .start-menu {
             position: fixed;
-            bottom: 48px;
-            left: 0;
-            width: 360px;
-            max-height: 600px;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            bottom: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 540px;
+            max-height: 680px;
+            background: rgba(32, 32, 32, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             display: none;
             flex-direction: column;
             z-index: 9999;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         .start-menu.active {
@@ -238,38 +269,41 @@
         }
 
         .start-menu-header {
-            background: linear-gradient(90deg, #0078d4, #005a9e);
-            color: white;
             padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
+            color: white;
         }
 
         .start-menu-items {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 0;
+            padding: 8px;
         }
 
         .start-menu-item {
-            padding: 12px 20px;
+            padding: 12px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: background 0.2s;
+            transition: all 0.2s;
             font-size: 14px;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 4px;
         }
 
         .start-menu-item:hover {
-            background: #f0f0f0;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .start-menu-item-icon {
             font-size: 20px;
         }
 
-        /* To-Do List ウィンドウ用スタイル */
+        /* To-Do List スタイル */
         .todolist-container {
             display: flex;
             flex-direction: column;
@@ -280,61 +314,99 @@
             display: flex;
             gap: 8px;
             padding: 12px;
-            background: #f5f5f5;
-            border-bottom: 1px solid #ddd;
+            background: rgba(45, 45, 45, 0.7);
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
 
         .todo-input {
             flex: 1;
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
             font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .todo-input:focus {
             outline: none;
-            border-color: #0078d4;
+            border-color: rgba(0, 120, 212, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .todo-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .todo-priority-select {
             padding: 6px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
             font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
             cursor: pointer;
+        }
+
+        .todo-priority-select:focus {
+            outline: none;
+            border-color: rgba(0, 120, 212, 0.5);
         }
 
         .todo-add-btn {
             padding: 8px 16px;
-            background: #0078d4;
+            background: rgba(0, 120, 212, 0.8);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         .todo-add-btn:hover {
-            background: #005a9e;
+            background: rgba(0, 120, 212, 1);
+        }
+
+        .todo-stats {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(45, 45, 45, 0.7);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .todo-stat {
+            flex: 1;
         }
 
         .todo-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .todo-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            margin-bottom: 6px;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(45, 45, 45, 0.7);
+            border-radius: 8px;
             font-size: 13px;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .todo-item:hover {
+            background: rgba(45, 45, 45, 0.9);
         }
 
         .todo-item.completed {
@@ -343,7 +415,7 @@
 
         .todo-item.completed .todo-text {
             text-decoration: line-through;
-            color: #999;
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .todo-checkbox {
@@ -354,582 +426,536 @@
 
         .todo-text {
             flex: 1;
-            color: #333;
         }
 
         .todo-priority-tag {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .todo-priority-tag.high {
-            background: #fed7d7;
-            color: #c53030;
+            background: rgba(232, 24, 40, 0.3);
+            color: #ff6b6b;
         }
 
         .todo-priority-tag.medium {
-            background: #feebc8;
-            color: #c05621;
+            background: rgba(255, 206, 0, 0.3);
+            color: #ffd666;
         }
 
         .todo-priority-tag.low {
-            background: #c6f6d5;
-            color: #22543d;
+            background: rgba(16, 185, 129, 0.3);
+            color: #5eead4;
         }
 
         .todo-delete-btn {
-            width: 20px;
-            height: 20px;
-            background: #ff6b6b;
+            width: 24px;
+            height: 24px;
+            background: rgba(232, 24, 40, 0.2);
             border: none;
-            color: white;
-            border-radius: 3px;
+            color: #ff6b6b;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
+            transition: all 0.2s;
         }
 
         .todo-delete-btn:hover {
-            background: #ff5252;
+            background: rgba(232, 24, 40, 0.5);
         }
 
-        .todo-stats {
-            padding: 8px 12px;
-            background: #f5f5f5;
-            border-top: 1px solid #ddd;
-            font-size: 12px;
-            color: #666;
+        .empty-state {
             display: flex;
-            gap: 15px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* その他アプリ */
+        .notepad-textarea {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 8px;
+            resize: none;
+        }
+
+        .notepad-textarea:focus {
+            outline: none;
+            border-color: rgba(0, 120, 212, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .notepad-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-display {
+            grid-column: 1 / -1;
+            background: rgba(45, 45, 45, 0.7);
+            color: #0078d4;
+            padding: 12px;
+            text-align: right;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calc-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .calc-btn.operator {
+            background: rgba(0, 120, 212, 0.3);
+            border-color: rgba(0, 120, 212, 0.5);
+            color: #0078d4;
+        }
+
+        .calc-btn.operator:hover {
+            background: rgba(0, 120, 212, 0.5);
+        }
+
+        .calc-btn.equals {
+            grid-column: 1 / -1;
+            background: rgba(0, 120, 212, 0.5);
+            border-color: rgba(0, 120, 212, 0.7);
+        }
+
+        .calc-btn.equals:hover {
+            background: rgba(0, 120, 212, 0.7);
+        }
+
+        /* スクロール */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="desktop">
-        <!-- デスクトップアイコン -->
-        <div class="desktop-icons">
-            <div class="desktop-icon" onclick="openWindow('notepad')">
-                <div class="desktop-icon-image">📝</div>
-                <div class="desktop-icon-label">メモ帳</div>
-            </div>
-            <div class="desktop-icon" onclick="openWindow('explorer')">
-                <div class="desktop-icon-image">📁</div>
-                <div class="desktop-icon-label">ファイル</div>
-            </div>
-            <div class="desktop-icon" onclick="openWindow('calculator')">
-                <div class="desktop-icon-image">🧮</div>
-                <div class="desktop-icon-label">計算機</div>
-            </div>
-            <div class="desktop-icon" onclick="openWindow('todolist')">
-                <div class="desktop-icon-image">✓</div>
-                <div class="desktop-icon-label">タスク</div>
-            </div>
-            <div class="desktop-icon" onclick="openWindow('settings')">
-                <div class="desktop-icon-image">⚙️</div>
-                <div class="desktop-icon-label">設定</div>
-            </div>
-        </div>
+    <div id="root"></div>
 
-        <!-- スタートメニュー -->
-        <div class="start-menu" id="startMenu">
-            <div class="start-menu-header">
-                👤 koueiwindows
-            </div>
-            <div class="start-menu-items">
-                <div class="start-menu-item" onclick="openWindow('notepad'); closeStartMenu()">
-                    <span class="start-menu-item-icon">📝</span>
-                    <span>メモ帳</span>
-                </div>
-                <div class="start-menu-item" onclick="openWindow('explorer'); closeStartMenu()">
-                    <span class="start-menu-item-icon">📁</span>
-                    <span>ファイルエクスプローラー</span>
-                </div>
-                <div class="start-menu-item" onclick="openWindow('calculator'); closeStartMenu()">
-                    <span class="start-menu-item-icon">🧮</span>
-                    <span>計算機</span>
-                </div>
-                <div class="start-menu-item" onclick="openWindow('todolist'); closeStartMenu()">
-                    <span class="start-menu-item-icon">✓</span>
-                    <span>タスク管理</span>
-                </div>
-                <div class="start-menu-item" onclick="openWindow('settings'); closeStartMenu()">
-                    <span class="start-menu-item-icon">⚙️</span>
-                    <span>設定</span>
-                </div>
-                <hr style="margin: 5px 0; border: none; border-top: 1px solid #e0e0e0;">
-                <div class="start-menu-item" onclick="alert('シャットダウン機能: デモ版では実装されていません')">
-                    <span class="start-menu-item-icon">🔌</span>
-                    <span>シャットダウン</span>
-                </div>
-            </div>
-        </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-        <!-- ウィンドウ -->
-        <!-- メモ帳 -->
-        <div class="window" id="notepad" style="width: 600px; height: 400px; top: 100px; left: 100px;">
-            <div class="window-title">
-                <span>notepad.exe</span>
-                <div class="window-buttons">
-                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
-                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
-                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
-                </div>
-            </div>
-            <div class="window-content">
-                <textarea placeholder="ここにテキストを入力してください..." style="width: 100%; height: 100%; border: none; font-family: 'Courier New', monospace; font-size: 14px; resize: none; padding: 8px;"></textarea>
-            </div>
-        </div>
+        function Window({ id, title, children, onClose, onMinimize, position, zIndex, minimized }) {
+            const [pos, setPos] = useState(position);
+            const [isDragging, setIsDragging] = useState(false);
+            const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+            const titleRef = useRef(null);
 
-        <!-- ファイルエクスプローラー -->
-        <div class="window" id="explorer" style="width: 700px; height: 450px; top: 150px; left: 200px;">
-            <div class="window-title">
-                <span>ファイルエクスプローラー</span>
-                <div class="window-buttons">
-                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
-                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
-                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
-                </div>
-            </div>
-            <div class="window-content">
-                <div style="display: flex; flex-direction: column; height: 100%;">
-                    <div style="background: #f0f0f0; padding: 8px; border-bottom: 1px solid #ddd; display: flex; gap: 8px;">
-                        <button style="padding: 6px 12px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; border-radius: 2px; font-size: 12px;">← 戻る</button>
-                        <button style="padding: 6px 12px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; border-radius: 2px; font-size: 12px;">→ 進む</button>
-                        <input type="text" value="C:\Users\koueiwindows\Documents" style="flex: 1; padding: 4px; border: 1px solid #999; border-radius: 2px; font-size: 12px;">
-                    </div>
-                    <div style="flex: 1; overflow-y: auto; padding: 10px;">
-                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
-                            <span style="font-size: 20px;">📁</span>
-                            <span style="font-size: 13px;">Desktop</span>
-                        </div>
-                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
-                            <span style="font-size: 20px;">📁</span>
-                            <span style="font-size: 13px;">Downloads</span>
-                        </div>
-                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
-                            <span style="font-size: 20px;">📁</span>
-                            <span style="font-size: 13px;">Documents</span>
-                        </div>
-                        <div style="padding: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 2px;" onmouseover="this.style.background='#e8f4f8'" onmouseout="this.style.background=''">
-                            <span style="font-size: 20px;">📄</span>
-                            <span style="font-size: 13px;">readme.txt</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 計算機 -->
-        <div class="window" id="calculator" style="width: 320px; height: 400px; top: 200px; left: 400px;">
-            <div class="window-title">
-                <span>電卓</span>
-                <div class="window-buttons">
-                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
-                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
-                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
-                </div>
-            </div>
-            <div class="window-content">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px;">
-                    <div id="calcDisplay" style="grid-column: 1 / -1; background: #1e1e1e; color: #00ff00; padding: 10px; text-align: right; font-size: 20px; font-family: 'Courier New', monospace; margin-bottom: 10px; border-radius: 2px;">0</div>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcClear()">C</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcBackspace()">←</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcPercent()">%</button>
-                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('/')">/</button>
-                    
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('7')">7</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('8')">8</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('9')">9</button>
-                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('*')">*</button>
-                    
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('4')">4</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('5')">5</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('6')">6</button>
-                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('-')">-</button>
-                    
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('1')">1</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('2')">2</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('3')">3</button>
-                    <button style="padding: 15px; background: #0078d4; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcOperator('+')">+</button>
-                    
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px; grid-column: 1 / 3;" onclick="calcNumber('0')">0</button>
-                    <button style="padding: 15px; background: #e0e0e0; border: 1px solid #999; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px;" onclick="calcNumber('.')">.</button>
-                    <button style="padding: 15px; background: #107c10; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 2px; grid-column: 1 / -1;" onclick="calcEquals()">=</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- To-Do List -->
-        <div class="window" id="todolist" style="width: 550px; height: 500px; top: 250px; left: 550px;">
-            <div class="window-title">
-                <span>✓ タスク管理</span>
-                <div class="window-buttons">
-                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
-                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
-                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
-                </div>
-            </div>
-            <div class="window-content">
-                <div class="todolist-container">
-                    <div class="todo-input-section">
-                        <input type="text" id="todoInput" class="todo-input" placeholder="新しいタスクを追加..." autocomplete="off">
-                        <select id="todoPriority" class="todo-priority-select">
-                            <option value="low">低</option>
-                            <option value="medium" selected>中</option>
-                            <option value="high">高</option>
-                        </select>
-                        <button class="todo-add-btn" onclick="addTodoTask()">追加</button>
-                    </div>
-                    <div class="todo-stats">
-                        <span>合計: <strong id="todoTotal">0</strong></span>
-                        <span>完了: <strong id="todoDone">0</strong></span>
-                        <span>未完: <strong id="todoPending">0</strong></span>
-                    </div>
-                    <div class="todo-list" id="todoListContainer"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 設定 -->
-        <div class="window" id="settings" style="width: 550px; height: 450px; top: 250px; left: 500px;">
-            <div class="window-title">
-                <span>設定</span>
-                <div class="window-buttons">
-                    <button class="window-btn" onclick="minimizeWindow(this)">_</button>
-                    <button class="window-btn" onclick="maximizeWindow(this)">□</button>
-                    <button class="window-btn close" onclick="closeWindow(this)">✕</button>
-                </div>
-            </div>
-            <div class="window-content" style="overflow-y: auto;">
-                <div style="padding: 15px;">
-                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
-                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">表示設定</h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>ダークモード</label>
-                            <input type="checkbox">
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>高コントラスト</label>
-                            <input type="checkbox">
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>画面の明るさ</label>
-                            <input type="range" min="0" max="100" value="80" style="width: 100px;">
-                        </div>
-                    </div>
-                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
-                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">サウンド設定</h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>通知音</label>
-                            <input type="checkbox" checked>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>ボリューム</label>
-                            <input type="range" min="0" max="100" value="70" style="width: 100px;">
-                        </div>
-                    </div>
-                    <div>
-                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">その他</h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px;">
-                            <label>言語</label>
-                            <select style="padding: 4px; border: 1px solid #999; border-radius: 2px;">
-                                <option>日本語</option>
-                                <option>English</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- タスクバー -->
-    <div class="taskbar">
-        <div class="start-menu-btn" onclick="toggleStartMenu()">⊞</div>
-        <div class="taskbar-separator"></div>
-        <div class="taskbar-apps">
-            <div class="taskbar-app" onclick="toggleWindow('notepad')" id="taskbar-notepad" title="メモ帳">📝</div>
-            <div class="taskbar-app" onclick="toggleWindow('explorer')" id="taskbar-explorer" title="ファイルエクスプローラー">📁</div>
-            <div class="taskbar-app" onclick="toggleWindow('calculator')" id="taskbar-calculator" title="電卓">🧮</div>
-            <div class="taskbar-app" onclick="toggleWindow('todolist')" id="taskbar-todolist" title="タスク管理">✓</div>
-            <div class="taskbar-app" onclick="toggleWindow('settings')" id="taskbar-settings" title="設定">⚙️</div>
-        </div>
-        <div class="taskbar-end">
-            <div class="clock" id="clock">12:00</div>
-        </div>
-    </div>
-
-    <script>
-        let currentZ = 100;
-        let calcValue = '0';
-        let calcOperator = null;
-        let calcPrevValue = null;
-        let calcNewValue = true;
-        let todos = [];
-
-        // ========== ウィンドウ管理 ==========
-        function openWindow(id) {
-            const window = document.getElementById(id);
-            window.classList.add('active');
-            window.style.zIndex = ++currentZ;
-            updateTaskbar();
-        }
-
-        function closeWindow(btn) {
-            const window = btn.closest('.window');
-            window.classList.remove('active');
-            updateTaskbar();
-        }
-
-        function minimizeWindow(btn) {
-            const window = btn.closest('.window');
-            window.classList.remove('active');
-            updateTaskbar();
-        }
-
-        function maximizeWindow(btn) {
-            const window = btn.closest('.window');
-            if (window.style.width === '100%') {
-                window.style.width = '';
-                window.style.height = '';
-                window.style.top = '';
-                window.style.left = '';
-            } else {
-                window.style.width = '100%';
-                window.style.height = 'calc(100% - 48px)';
-                window.style.top = '0';
-                window.style.left = '0';
-            }
-        }
-
-        function toggleWindow(id) {
-            const window = document.getElementById(id);
-            if (window.classList.contains('active')) {
-                window.classList.remove('active');
-            } else {
-                openWindow(id);
-            }
-            updateTaskbar();
-        }
-
-        // ========== ドラッグ機能 ==========
-        let dragElement = null;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        document.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.window-title')) {
-                dragElement = e.target.closest('.window');
-                dragElement.style.zIndex = ++currentZ;
-                const rect = dragElement.getBoundingClientRect();
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-            }
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (dragElement) {
-                dragElement.style.left = (e.clientX - offsetX) + 'px';
-                dragElement.style.top = (e.clientY - offsetY) + 'px';
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            dragElement = null;
-        });
-
-        // ========== スタートメニュー ==========
-        function toggleStartMenu() {
-            const menu = document.getElementById('startMenu');
-            menu.classList.toggle('active');
-        }
-
-        function closeStartMenu() {
-            const menu = document.getElementById('startMenu');
-            menu.classList.remove('active');
-        }
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.start-menu-btn') && !e.target.closest('.start-menu')) {
-                closeStartMenu();
-            }
-        });
-
-        // ========== タスクバー更新 ==========
-        function updateTaskbar() {
-            ['notepad', 'explorer', 'calculator', 'todolist', 'settings'].forEach(id => {
-                const window = document.getElementById(id);
-                const taskbarBtn = document.getElementById(`taskbar-${id}`);
-                if (window.classList.contains('active')) {
-                    taskbarBtn.classList.add('active');
-                } else {
-                    taskbarBtn.classList.remove('active');
+            const handleMouseDown = (e) => {
+                if (titleRef.current && titleRef.current.contains(e.target)) {
+                    setIsDragging(true);
+                    setDragOffset({
+                        x: e.clientX - pos.x,
+                        y: e.clientY - pos.y
+                    });
                 }
-            });
-        }
-
-        // ========== 計算機機能 ==========
-        function calcNumber(num) {
-            if (calcNewValue) {
-                calcValue = num;
-                calcNewValue = false;
-            } else {
-                calcValue = calcValue === '0' ? num : calcValue + num;
-            }
-            document.getElementById('calcDisplay').textContent = calcValue;
-        }
-
-        function calcOperator(op) {
-            calcPrevValue = calcValue;
-            calcOperator = op;
-            calcNewValue = true;
-        }
-
-        function calcEquals() {
-            if (calcOperator && calcPrevValue) {
-                const prev = parseFloat(calcPrevValue);
-                const curr = parseFloat(calcValue);
-                let result = 0;
-
-                switch(calcOperator) {
-                    case '+': result = prev + curr; break;
-                    case '-': result = prev - curr; break;
-                    case '*': result = prev * curr; break;
-                    case '/': result = prev / curr; break;
-                }
-
-                calcValue = result.toString();
-                calcOperator = null;
-                calcPrevValue = null;
-                calcNewValue = true;
-                document.getElementById('calcDisplay').textContent = calcValue;
-            }
-        }
-
-        function calcClear() {
-            calcValue = '0';
-            calcOperator = null;
-            calcPrevValue = null;
-            calcNewValue = true;
-            document.getElementById('calcDisplay').textContent = '0';
-        }
-
-        function calcBackspace() {
-            if (calcValue.length > 1) {
-                calcValue = calcValue.slice(0, -1);
-            } else {
-                calcValue = '0';
-            }
-            document.getElementById('calcDisplay').textContent = calcValue;
-        }
-
-        function calcPercent() {
-            calcValue = (parseFloat(calcValue) / 100).toString();
-            document.getElementById('calcDisplay').textContent = calcValue;
-        }
-
-        // ========== To-Do List機能 ==========
-        function loadTodos() {
-            const saved = localStorage.getItem('desktopTodos');
-            if (saved) {
-                todos = JSON.parse(saved);
-            }
-            renderTodoList();
-        }
-
-        function saveTodos() {
-            localStorage.setItem('desktopTodos', JSON.stringify(todos));
-        }
-
-        function addTodoTask() {
-            const input = document.getElementById('todoInput');
-            const priority = document.getElementById('todoPriority').value;
-            const text = input.value.trim();
-
-            if (text === '') {
-                return;
-            }
-
-            const todo = {
-                id: Date.now(),
-                text: text,
-                completed: false,
-                priority: priority
             };
 
-            todos.unshift(todo);
-            input.value = '';
-            input.focus();
-            saveTodos();
-            renderTodoList();
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    if (isDragging) {
+                        setPos({
+                            x: e.clientX - dragOffset.x,
+                            y: e.clientY - dragOffset.y
+                        });
+                    }
+                };
+
+                const handleMouseUp = () => {
+                    setIsDragging(false);
+                };
+
+                if (isDragging) {
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                }
+
+                return () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+            }, [isDragging, dragOffset]);
+
+            return (
+                <div
+                    className={`window ${minimized ? 'minimized' : ''}`}
+                    style={{
+                        left: `${pos.x}px`,
+                        top: `${pos.y}px`,
+                        zIndex: zIndex,
+                    }}
+                >
+                    <div className="window-title" ref={titleRef} onMouseDown={handleMouseDown}>
+                        <span>{title}</span>
+                        <div className="window-buttons">
+                            <button className="window-btn" onClick={onMinimize}>_</button>
+                            <button className="window-btn" onClick={onMinimize}>□</button>
+                            <button className="window-btn close" onClick={onClose}>✕</button>
+                        </div>
+                    </div>
+                    <div className="window-content">
+                        {children}
+                    </div>
+                </div>
+            );
         }
 
-        function toggleTodoItem(id) {
-            const todo = todos.find(t => t.id === id);
-            if (todo) {
-                todo.completed = !todo.completed;
-                saveTodos();
-                renderTodoList();
-            }
-        }
+        function TodoApp() {
+            const [todos, setTodos] = useState([]);
+            const [input, setInput] = useState('');
+            const [priority, setPriority] = useState('medium');
 
-        function deleteTodoItem(id) {
-            todos = todos.filter(t => t.id !== id);
-            saveTodos();
-            renderTodoList();
-        }
+            useEffect(() => {
+                const saved = localStorage.getItem('win11Todos');
+                if (saved) {
+                    setTodos(JSON.parse(saved));
+                }
+            }, []);
 
-        function renderTodoList() {
-            const container = document.getElementById('todoListContainer');
+            const saveTodos = (newTodos) => {
+                setTodos(newTodos);
+                localStorage.setItem('win11Todos', JSON.stringify(newTodos));
+            };
+
+            const addTodo = () => {
+                if (input.trim() === '') return;
+                const newTodo = {
+                    id: Date.now(),
+                    text: input,
+                    completed: false,
+                    priority: priority
+                };
+                saveTodos([newTodo, ...todos]);
+                setInput('');
+            };
+
+            const toggleTodo = (id) => {
+                saveTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+            };
+
+            const deleteTodo = (id) => {
+                saveTodos(todos.filter(t => t.id !== id));
+            };
+
             const total = todos.length;
             const done = todos.filter(t => t.completed).length;
             const pending = total - done;
 
-            document.getElementById('todoTotal').textContent = total;
-            document.getElementById('todoDone').textContent = done;
-            document.getElementById('todoPending').textContent = pending;
-
-            if (todos.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #999;"><div style="font-size: 36px; margin-bottom: 10px;">✨</div><div>タスクはありません</div></div>';
-                return;
-            }
-
-            container.innerHTML = todos.map(todo => `
-                <div class="todo-item ${todo.completed ? 'completed' : ''}">
-                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodoItem(${todo.id})">
-                    <div class="todo-text">${escapeHtml(todo.text)}</div>
-                    <span class="todo-priority-tag ${todo.priority}">${todo.priority}</span>
-                    <button class="todo-delete-btn" onclick="deleteTodoItem(${todo.id})">✕</button>
+            return (
+                <div className="todolist-container">
+                    <div className="todo-input-section">
+                        <input
+                            type="text"
+                            className="todo-input"
+                            placeholder="新しいタスク..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+                        />
+                        <select className="todo-priority-select" value={priority} onChange={(e) => setPriority(e.target.value)}>
+                            <option value="low">低</option>
+                            <option value="medium">中</option>
+                            <option value="high">高</option>
+                        </select>
+                        <button className="todo-add-btn" onClick={addTodo}>追加</button>
+                    </div>
+                    <div className="todo-stats">
+                        <div className="todo-stat">合計: <strong>{total}</strong></div>
+                        <div className="todo-stat">完了: <strong>{done}</strong></div>
+                        <div className="todo-stat">未完: <strong>{pending}</strong></div>
+                    </div>
+                    <div className="todo-list">
+                        {todos.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">✨</div>
+                                <div>タスクなし</div>
+                            </div>
+                        ) : (
+                            todos.map(todo => (
+                                <div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        className="todo-checkbox"
+                                        checked={todo.completed}
+                                        onChange={() => toggleTodo(todo.id)}
+                                    />
+                                    <div className="todo-text">{todo.text}</div>
+                                    <span className={`todo-priority-tag ${todo.priority}`}>{todo.priority}</span>
+                                    <button className="todo-delete-btn" onClick={() => deleteTodo(todo.id)}>✕</button>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
-            `).join('');
+            );
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        function Calculator() {
+            const [display, setDisplay] = useState('0');
+            const [prevValue, setPrevValue] = useState(null);
+            const [operator, setOperator] = useState(null);
+            const [newNumber, setNewNumber] = useState(true);
+
+            const handleNumber = (num) => {
+                if (newNumber) {
+                    setDisplay(String(num));
+                    setNewNumber(false);
+                } else {
+                    setDisplay(display === '0' ? String(num) : display + num);
+                }
+            };
+
+            const handleOperator = (op) => {
+                setPrevValue(parseFloat(display));
+                setOperator(op);
+                setNewNumber(true);
+            };
+
+            const handleEquals = () => {
+                if (operator && prevValue !== null) {
+                    const curr = parseFloat(display);
+                    let result = 0;
+                    switch (operator) {
+                        case '+': result = prevValue + curr; break;
+                        case '-': result = prevValue - curr; break;
+                        case '*': result = prevValue * curr; break;
+                        case '/': result = prevValue / curr; break;
+                    }
+                    setDisplay(String(result));
+                    setPrevValue(null);
+                    setOperator(null);
+                    setNewNumber(true);
+                }
+            };
+
+            const handleClear = () => {
+                setDisplay('0');
+                setPrevValue(null);
+                setOperator(null);
+                setNewNumber(true);
+            };
+
+            const buttons = [
+                ['C', '←', '%', '/'],
+                ['7', '8', '9', '*'],
+                ['4', '5', '6', '-'],
+                ['1', '2', '3', '+'],
+                ['0', '.', '=']
+            ];
+
+            return (
+                <div className="calculator">
+                    <div className="calc-display">{display}</div>
+                    {buttons.map((row, i) => (
+                        row.map((btn, j) => (
+                            <button
+                                key={`${i}-${j}`}
+                                className={`calc-btn ${['/', '*', '-', '+'].includes(btn) ? 'operator' : ''} ${btn === '=' ? 'equals' : ''}`}
+                                onClick={() => {
+                                    if (btn === 'C') handleClear();
+                                    else if (btn === '←') setDisplay(display.slice(0, -1) || '0');
+                                    else if (btn === '%') setDisplay(String(parseFloat(display) / 100));
+                                    else if (['+', '-', '*', '/'].includes(btn)) handleOperator(btn);
+                                    else if (btn === '=') handleEquals();
+                                    else handleNumber(btn);
+                                }}
+                                style={btn === '0' ? { gridColumn: '1 / 3' } : {}}
+                            >
+                                {btn}
+                            </button>
+                        ))
+                    ))}
+                </div>
+            );
         }
 
-        // ========== 時計 ==========
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+        function Desktop() {
+            const [windows, setWindows] = useState([
+                { id: 'notepad', title: '📝 メモ帳', visible: false, minimized: false, position: { x: 100, y: 100 } },
+                { id: 'calculator', title: '🧮 計算機', visible: false, minimized: false, position: { x: 400, y: 150 } },
+                { id: 'todolist', title: '✓ タスク', visible: false, minimized: false, position: { x: 700, y: 200 } },
+            ]);
+            const [startMenuOpen, setStartMenuOpen] = useState(false);
+            const [clock, setClock] = useState(new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
+            const [zIndex, setZIndex] = useState(100);
+            const [notepadContent, setNotepadContent] = useState('');
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setClock(new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
+                }, 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            const toggleWindow = (id) => {
+                setWindows(windows.map(w =>
+                    w.id === id ? { ...w, visible: !w.visible, minimized: false } : w
+                ));
+                setZIndex(zIndex + 1);
+                setStartMenuOpen(false);
+            };
+
+            const closeWindow = (id) => {
+                setWindows(windows.map(w => w.id === id ? { ...w, visible: false } : w));
+            };
+
+            const minimizeWindow = (id) => {
+                setWindows(windows.map(w => w.id === id ? { ...w, minimized: !w.minimized } : w));
+            };
+
+            const openWindow = (id) => {
+                setWindows(windows.map(w => w.id === id ? { ...w, visible: true, minimized: false } : w));
+                setStartMenuOpen(false);
+                setZIndex(zIndex + 1);
+            };
+
+            const getWindowContent = (id) => {
+                switch (id) {
+                    case 'notepad':
+                        return <textarea className="notepad-textarea" placeholder="ここに入力..." value={notepadContent} onChange={(e) => setNotepadContent(e.target.value)} />;
+                    case 'calculator':
+                        return <Calculator />;
+                    case 'todolist':
+                        return <TodoApp />;
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="desktop-container">
+                    <div className="desktop-area">
+                        <div className="desktop-icons">
+                            <div className="desktop-icon" onDoubleClick={() => openWindow('notepad')}>
+                                <div className="desktop-icon-image">📝</div>
+                                <div className="desktop-icon-label">メモ帳</div>
+                            </div>
+                            <div className="desktop-icon" onDoubleClick={() => openWindow('calculator')}>
+                                <div className="desktop-icon-image">🧮</div>
+                                <div className="desktop-icon-label">計算機</div>
+                            </div>
+                            <div className="desktop-icon" onDoubleClick={() => openWindow('todolist')}>
+                                <div className="desktop-icon-image">✓</div>
+                                <div className="desktop-icon-label">タスク</div>
+                            </div>
+                        </div>
+
+                        {windows.filter(w => w.visible).map((w, idx) => (
+                            <Window
+                                key={w.id}
+                                id={w.id}
+                                title={w.title}
+                                position={w.position}
+                                zIndex={zIndex - windows.length + idx}
+                                minimized={w.minimized}
+                                onClose={() => closeWindow(w.id)}
+                                onMinimize={() => minimizeWindow(w.id)}
+                            >
+                                {getWindowContent(w.id)}
+                            </Window>
+                        ))}
+
+                        {startMenuOpen && (
+                            <div className="start-menu active">
+                                <div className="start-menu-header">👤 Windows 11</div>
+                                <div className="start-menu-items">
+                                    <div className="start-menu-item" onClick={() => openWindow('notepad')}>
+                                        <span className="start-menu-item-icon">📝</span>
+                                        <span>メモ帳</span>
+                                    </div>
+                                    <div className="start-menu-item" onClick={() => openWindow('calculator')}>
+                                        <span className="start-menu-item-icon">🧮</span>
+                                        <span>計算機</span>
+                                    </div>
+                                    <div className="start-menu-item" onClick={() => openWindow('todolist')}>
+                                        <span className="start-menu-item-icon">✓</span>
+                                        <span>タスク管理</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="taskbar">
+                        <div className="taskbar-apps">
+                            <button
+                                className="taskbar-app"
+                                onClick={() => setStartMenuOpen(!startMenuOpen)}
+                                title="スタート"
+                            >
+                                ⊞
+                            </button>
+                            {windows.map(w => (
+                                <button
+                                    key={w.id}
+                                    className={`taskbar-app ${w.visible && !w.minimized ? 'active' : ''}`}
+                                    onClick={() => toggleWindow(w.id)}
+                                    title={w.title}
+                                >
+                                    {w.title.split(' ')[0]}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="taskbar-end">
+                            <div className="clock">{clock}</div>
+                        </div>
+                    </div>
+                </div>
+            );
         }
 
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // ========== 初期化 ==========
-        document.getElementById('todoInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addTodoTask();
-            }
-        });
-
-        loadTodos();
+        ReactDOM.render(<Desktop />, document.getElementById('root'));
     </script>
 </body>
 </html>
